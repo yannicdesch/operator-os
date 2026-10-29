@@ -42,7 +42,82 @@ A capable model can do all of this if you brief it carefully every time. Operato
 | Switching tools | Re-explain everything | Same five files in Claude, ChatGPT, Cursor, anywhere |
 | Handoff to a person or agent | Lives in your head | Lives in the repo; onboarding takes minutes |
 
-## Getting started
+## Bearing: Operator OS for coding agents
+
+The five files are the memory. Bearing (`bearing` on the command line) is what a coding agent does with it. It sets the course before the agent builds, keeps it on that course while it works, and reports where it drifted.
+
+Coding agents build fast. Keeping them pointed at the right problem takes work: explaining the goal, challenging assumptions, checking the result, and picking up the thread in the next session. Product harnesses solve part of that by turning the work into a spec the agent builds against. What they cannot know is *why* the work matters to you: which priority it serves, which decision it feeds, which decision is already closed, and who will push back.
+
+Bearing adds exactly that. Every workflow reads your five files first, and every spec is checked against them.
+
+```
+npm install -g @yannicdesch/bearing
+cd /path/to/your/project
+bearing init          # context files, config, agent workflows, a suggested first move
+bearing doctor
+```
+
+Then talk to your coding agent the way you already do, and name a workflow:
+
+```
+/bearing-spec New customers need three calls before they can use the product. Find what we can cut.
+```
+
+### How it works
+
+```
+  SIGNAL                  SHAPE                              BUILD + PROVE
+  ──────                  ─────                              ─────────────
+  an idea or request ──▶  /bearing-interview-me  ┐
+  customer material  ──▶  /bearing-discovery     │
+  public research    ──▶  /bearing-research      ├──▶ spec ──▶ /bearing-build
+  "should we?"       ──▶  /bearing-pitch         ┘  [you agree]  tasks.yaml stays honest
+                          /bearing-roast                          │
+                          /bearing-preview                        ▼
+                                                     bearing reconcile --git-diff
+                                                     drift or proof ──▶ [you approve]
+
+  Every step reads me.md · company.md · decisions.md · people.md · style.md
+  and `bearing spec check` holds each spec against them.
+```
+
+A spec is three plain files in `specs/<slug>/`, so the next agent (or person) continues from the recorded state:
+
+| File | What it keeps |
+|---|---|
+| `spec.md` | Problem, context, scope in and out, decisions, open questions, acceptance. Frontmatter links the **priority** from `me.md`, the **decision** from `decisions.md` and the **stakeholders** from `people.md`. |
+| `tasks.yaml` | Tasks with status, `files` they may touch, acceptance `checks` and `evidence`. Each task is `agreed`, `proposed` (waits for your call) or `discovered` (found while building). |
+| `events.jsonl` | The record of what happened. |
+
+### What the context adds
+
+| | Bare coding agent | Product harness | Bearing |
+|---|---|---|---|
+| Starting point | Your prompt | An agreed spec | An agreed spec tied to a current priority and an open decision |
+| "Should we build this?" | Whatever you ask it to consider | A GO / NO-GO case | The case in your company's numbers, with a kill criterion |
+| Closed decisions | Reopened whenever the prompt drifts | Not known | Flagged when a spec touches one |
+| Stakeholders | Unknown | Unknown | Named from `people.md`; unknown names are flagged |
+| "Done" | Tests pass | Checked against the spec | Checked against the spec, with drift and missing proof surfaced for you |
+
+### Commands
+
+| When you want to… | Use |
+|---|---|
+| Set up a project and get a first move | `bearing init` |
+| Check your setup and how fresh your context is | `bearing doctor` |
+| Print the context an agent reads | `bearing context` |
+| Start a spec | `bearing spec new "<title>" --priority "…" --decision "…" --stakeholder "…"` |
+| Validate a spec against structure and context | `bearing spec check <slug>` (or `--all`) |
+| Track work | `bearing task add`, `bearing task set <slug> T1 --status done --evidence test:"npm test"` |
+| Compare the build with the agreement | `bearing reconcile <slug> --git-diff [--base main] [--strict]` |
+| See where every spec stands | `bearing status` |
+| Install workflows for an agent | `bearing setup claude`, `bearing setup cursor`, `bearing setup codex` |
+
+Agent workflows: `interview-me`, `spec`, `roast`, `pitch`, `ideate`, `research`, `discovery`, `preview`, `build`, `reconcile`. In Claude Code they are skills (`/bearing-spec`), in Cursor rules, for Codex and other agents a block in `AGENTS.md` that points to `.bearing/skills/`.
+
+Bearing runs locally and needs no account. Your coding agent and model provider still see what you give them; keep confidential numbers in a private copy of the context files. The checks help you review agent work. They are not a sandbox and cannot guarantee what an agent does.
+
+## Getting started with the five files
 
 1. Fork this repo (or download it — it's just five text files).
 2. Open `me.md`. Delete the comments. Write the first section: your role and what you own. 20 minutes.
@@ -98,8 +173,13 @@ Operator OS doesn't change how your AI works. It changes what your AI knows. A c
 
 ## Roadmap
 
-- **Skills.** A `skills/` directory with task-specific instructions that read the five files — `board-prep`, `weekly-review`, `decision-memo` — installable as a Claude Code or Cursor plugin. The files are the memory; skills are what you do with it.
+- **Operator workflows.** `board-prep`, `weekly-review`, `decision-memo` and a 100-day plan, built on the same context, for work that is not a code change.
+- **Decision loop.** `bearing` proposes the exact `decisions.md` entry when a pitch or spec closes a decision; the next step is applying it with your approval.
 - **Team layout.** A documented pattern for one shared `company.md` plus private per-person files.
+
+## Acknowledgments
+
+Bearing is inspired by [productfoo](https://github.com/rwo572/productfoo) by Rachel Wolan, an agentic product management harness for coding agents. The spec-plus-reconcile shape comes from there; the code and workflows here are written independently, and the context layer is what Operator OS adds.
 
 ## Status
 
