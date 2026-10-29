@@ -6,9 +6,9 @@ import { sections, slugify, today } from './util.js'
 
 export const SPEC_STATUSES = ['draft', 'agreed', 'building', 'done', 'parked'] as const
 export const TASK_STATUSES = ['todo', 'doing', 'done', 'dropped'] as const
-// agreed: part of the spec you signed off. prpolarised: waits for your call.
+// agreed: part of the spec you signed off. proposed: waits for your call.
 // discovered: necessary work the agent found while building.
-export const TASK_ORIGINS = ['agreed', 'prpolarised', 'discovered'] as const
+export const TASK_ORIGINS = ['agreed', 'proposed', 'discovered'] as const
 
 export const REQUIRED_SECTIONS = ['Problem', 'Context', 'Scope', 'Decisions', 'Open questions', 'Acceptance'] as const
 
@@ -119,7 +119,7 @@ export function specSections(spec: Spec): string[] {
 }
 
 const TASKS_HEADER = `# status: todo | doing | done | dropped
-# origin: agreed (in the spec you signed off) | prpolarised (waits for your call) | discovered (found while building)
+# origin: agreed (in the spec you signed off) | proposed (waits for your call) | discovered (found while building)
 # files: globs this task is allowed to touch; reconcile flags changes no task claims
 # evidence: proof that a check passed, e.g. { type: test, ref: "npm test -- filters" }
 `

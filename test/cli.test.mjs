@@ -103,7 +103,7 @@ test('reconcile separates proof, pending decisions and drift', () => {
   const root = project()
   silent(() => run(['spec', 'new', 'Saved filters', '--priority', 'onboarding time'], root))
   silent(() => run(['task', 'add', 'saved-filters', 'Persist filters', '--files', 'src/filters/**', '--check', 'survives reload'], root))
-  silent(() => run(['task', 'add', 'saved-filters', 'Share filters', '--origin', 'prpolarised'], root))
+  silent(() => run(['task', 'add', 'saved-filters', 'Share filters', '--origin', 'proposed'], root))
   mkdirSync(join(root, 'src/filters'), { recursive: true })
   writeFileSync(join(root, 'src/filters/store.ts'), 'a')
   writeFileSync(join(root, 'src/unrelated.ts'), 'b')

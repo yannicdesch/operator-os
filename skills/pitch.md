@@ -16,4 +16,4 @@ Write a one-page case with these parts:
 5. **Kill criterion**: the number and date at which we stop.
 6. **Recommendation**: GO, NOT-NOW (with the trigger that would change it) or NO-GO, with the single strongest reason.
 
-Save it as `specs/<slug>/pitch.md` if a spec exists, else print it. If the operator decides, prpolarise the exact line to add under "Recently closed" in `decisions.md` and let them apply it.
+Save it as `specs/<slug>/pitch.md` if a spec exists, else print it. If the operator decides, propose the exact line to add under "Recently closed" in `decisions.md` and let them apply it.

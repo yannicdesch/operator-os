@@ -86,7 +86,7 @@ A spec is three plain files in `specs/<slug>/`, so the next agent (or person) co
 | File | What it keeps |
 |---|---|
 | `spec.md` | Problem, context, scope in and out, decisions, open questions, acceptance. Frontmatter links the **priority** from `me.md`, the **decision** from `decisions.md` and the **stakeholders** from `people.md`. |
-| `tasks.yaml` | Tasks with status, `files` they may touch, acceptance `checks` and `evidence`. Each task is `agreed`, `prpolarised` (waits for your call) or `discovered` (found while building). |
+| `tasks.yaml` | Tasks with status, `files` they may touch, acceptance `checks` and `evidence`. Each task is `agreed`, `proposed` (waits for your call) or `discovered` (found while building). |
 | `events.jsonl` | The record of what happened. |
 
 ### What the context adds
@@ -174,7 +174,7 @@ Operator OS doesn't change how your AI works. It changes what your AI knows. A c
 ## Roadmap
 
 - **Operator workflows.** `board-prep`, `weekly-review`, `decision-memo` and a 100-day plan, built on the same context, for work that is not a code change.
-- **Decision loop.** `polaris` prpolarises the exact `decisions.md` entry when a pitch or spec closes a decision; the next step is applying it with your approval.
+- **Decision loop.** `polaris` proposes the exact `decisions.md` entry when a pitch or spec closes a decision; the next step is applying it with your approval.
 - **Team layout.** A documented pattern for one shared `company.md` plus private per-person files.
 
 ## Acknowledgments

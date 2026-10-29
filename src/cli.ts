@@ -86,7 +86,7 @@ All commands
   polaris spec list
   polaris spec show <slug>
   polaris spec check <slug> | --all
-  polaris task add <slug> "<title>" [--origin agreed|prpolarised|discovered] [--files "glob,glob"] [--check "..."]...
+  polaris task add <slug> "<title>" [--origin agreed|proposed|discovered] [--files "glob,glob"] [--check "..."]...
   polaris task set <slug> <id> [--status todo|doing|done|dropped] [--evidence type:ref]...
   polaris event <slug> <type> [--note "..."]
   polaris reconcile <slug> [--git-diff] [--base <ref>] [--json] [--strict]
@@ -269,7 +269,7 @@ function status(root: string, log: (s?: string) => void): number {
     const live = s.tasks.filter(t => t.status !== 'dropped')
     log(`${slug.padEnd(32)} ${String(s.meta.status).padEnd(9)} ${count(t => t.status === 'done')}/${live.length} done` +
       `${count(t => t.status === 'done' && !(t.evidence ?? []).length) ? `, ${count(t => t.status === 'done' && !(t.evidence ?? []).length)} without proof` : ''}` +
-      `${count(t => t.origin === 'prpolarised' && t.status === 'todo') ? `, ${count(t => t.origin === 'prpolarised' && t.status === 'todo')} awaiting decision` : ''}` +
+      `${count(t => t.origin === 'proposed' && t.status === 'todo') ? `, ${count(t => t.origin === 'proposed' && t.status === 'todo')} awaiting decision` : ''}` +
       `${s.meta.priority ? `  · ${s.meta.priority}` : ''}`)
   }
   return 0

@@ -54,8 +54,8 @@ export function reconcile(root: string, spec: Spec, opts: ReconcileOptions): Rec
     proven: live.filter(t => t.status === 'done' && (t.evidence ?? []).length > 0),
     proofPending: live.filter(t => t.status === 'done' && !(t.evidence ?? []).length),
     inProgress: live.filter(t => t.status === 'doing'),
-    notStarted: live.filter(t => t.status === 'todo' && t.origin !== 'prpolarised'),
-    awaitingDecision: live.filter(t => t.origin === 'prpolarised' && t.status === 'todo'),
+    notStarted: live.filter(t => t.status === 'todo' && t.origin !== 'proposed'),
+    awaitingDecision: live.filter(t => t.origin === 'proposed' && t.status === 'todo'),
     discovered: live.filter(t => t.origin === 'discovered'),
     drift: [],
     changedFiles: [],
@@ -89,7 +89,7 @@ export function formatReport(r: ReconcileReport): string {
   block('Done, proof pending: marked done without evidence', list(r.proofPending))
   block('In progress', list(r.inProgress))
   block('Not started', list(r.notStarted))
-  block('Waiting for your decision (prpolarised, not agreed)', list(r.awaitingDecision))
+  block('Waiting for your decision (proposed, not agreed)', list(r.awaitingDecision))
   block('Discovered while building: check these belong in scope', list(r.discovered))
   block('Drift: changed files no task claims', r.drift.map(f => `  ${f}`).join('\n'))
 

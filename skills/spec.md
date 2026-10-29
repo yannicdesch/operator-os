@@ -17,6 +17,6 @@ Goal: one agreed document the coding agent builds against.
    - **Decisions**: settled calls with a one-line reason.
    - **Open questions**: only the ones that change the work, each with who can answer it.
    - **Acceptance**: checks a reviewer can run or observe.
-4. Fill `tasks.yaml`. One task per acceptance check or coherent slice. Every agreed task gets `checks` and the `files` globs it may touch. Use `origin: prpolarised` for anything you suggest beyond what the operator asked for.
+4. Fill `tasks.yaml`. One task per acceptance check or coherent slice. Every agreed task gets `checks` and the `files` globs it may touch. Use `origin: proposed` for anything you suggest beyond what the operator asked for.
 5. Run `polaris spec check <slug>` and fix every error. Explain any warning you leave.
 6. Show the operator the scope, the decisions and the open questions, and ask them to agree. Only when they agree: set `status: agreed` in the frontmatter and run `polaris event <slug> spec.agreed`.
