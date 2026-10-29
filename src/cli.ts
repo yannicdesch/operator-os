@@ -57,38 +57,39 @@ const has = (a: Args, k: string) => k in a.flags
 
 class UsageError extends Error {}
 
-const HELP = `opos ${VERSION}: Operator OS for coding agents
+const HELP = `Polaris ${VERSION}: points your coding agent at the work that matters, using your Operator OS context
 
 Main workflows
-  opos init                       Set up Operator OS in this project and suggest a first move
-  opos doctor                     Check node, git, context files and agent setup
-  opos context                    Print your context (me, company, style, decisions, people)
-  opos spec new "<title>"         Create a spec tied to a priority and an open decision
-  opos spec check <slug>          Validate a spec against its structure and your context
-  opos reconcile <slug> --git-diff
-                                  Compare what was built with what was agreed
+  polaris init                       Set up Operator OS in this project and suggest a first move
+  polaris doctor                     Check node, git, context files and agent setup
+  polaris context                    Print your context (me, company, style, decisions, people)
+  polaris spec new "<title>"         Create a spec tied to a priority and an open decision
+  polaris spec check <slug>          Validate a spec against its structure and your context
+  polaris reconcile <slug> --git-diff
+                                     Compare what was built with what was agreed
 
-In your coding agent (after \`opos setup claude\`), ask for a workflow by name:
-  /opos-interview-me  /opos-spec  /opos-roast  /opos-pitch  /opos-build  /opos-reconcile
+In your coding agent (after \`polaris setup claude\`), ask for a workflow by name:
+  /polaris-interview-me  /polaris-spec  /polaris-roast
+  /polaris-pitch  /polaris-build  /polaris-reconcile
 
-Run \`opos help --all\` for every command.`
+Run \`polaris help --all\` for every command.`
 
 const HELP_ALL = `${HELP}
 
 All commands
-  opos init [--context <dir>] [--agent claude|cursor|codex]
-  opos doctor
-  opos setup <claude|cursor|codex>
-  opos context [--json]
-  opos status
-  opos spec new "<title>" [--slug s] [--priority p] [--decision d] [--owner o] [--stakeholder name]...
-  opos spec list
-  opos spec show <slug>
-  opos spec check <slug> | --all
-  opos task add <slug> "<title>" [--origin agreed|proposed|discovered] [--files "glob,glob"] [--check "..."]...
-  opos task set <slug> <id> [--status todo|doing|done|dropped] [--evidence type:ref]...
-  opos event <slug> <type> [--note "..."]
-  opos reconcile <slug> [--git-diff] [--base <ref>] [--json] [--strict]
+  polaris init [--context <dir>] [--agent claude|cursor|codex]
+  polaris doctor
+  polaris setup <claude|cursor|codex>
+  polaris context [--json]
+  polaris status
+  polaris spec new "<title>" [--slug s] [--priority p] [--decision d] [--owner o] [--stakeholder name]...
+  polaris spec list
+  polaris spec show <slug>
+  polaris spec check <slug> | --all
+  polaris task add <slug> "<title>" [--origin agreed|prpolarised|discovered] [--files "glob,glob"] [--check "..."]...
+  polaris task set <slug> <id> [--status todo|doing|done|dropped] [--evidence type:ref]...
+  polaris event <slug> <type> [--note "..."]
+  polaris reconcile <slug> [--git-diff] [--base <ref>] [--json] [--strict]
 
 Workflows for your agent: interview-me, spec, roast, pitch, ideate, research, discovery, preview, build, reconcile.`
 
@@ -120,7 +121,7 @@ export function run(argv: string[], root = process.cwd()): number {
 
     case 'setup': {
       const agent = sub as Agent
-      if (!AGENTS.includes(agent)) throw new UsageError(`Usage: opos setup <${AGENTS.join('|')}>`)
+      if (!AGENTS.includes(agent)) throw new UsageError(`Usage: polaris setup <${AGENTS.join('|')}>`)
       const files = setupAgent(root, agent)
       log(`Installed ${files.length} file(s) for ${agent}:`)
       files.forEach(f => log(`  ${f}`))
@@ -130,7 +131,7 @@ export function run(argv: string[], root = process.cwd()): number {
     case 'context': {
       const ctx = loadContext(root)
       if (!Object.keys(ctx.files).length) {
-        log(`No context files in ${relative(root, ctx.dir) || '.'}. Run \`opos init\` first.`)
+        log(`No context files in ${relative(root, ctx.dir) || '.'}. Run \`polaris init\` first.`)
         return 1
       }
       if (has(args, 'json')) {
@@ -151,7 +152,7 @@ export function run(argv: string[], root = process.cwd()): number {
       return task(root, sub, rest, args, log)
 
     case 'event': {
-      if (!sub || !rest[0]) throw new UsageError('Usage: opos event <slug> <type> [--note "..."]')
+      if (!sub || !rest[0]) throw new UsageError('Usage: polaris event <slug> <type> [--note "..."]')
       const s = loadSpec(root, sub)
       appendEvent(s.dir, rest[0], flag(args, 'note') ? { note: flag(args, 'note') } : {}, 'agent')
       if (rest[0] === 'spec.agreed' || rest[0] === 'spec.done') log(`Logged ${rest[0]}. Remember to set status in spec.md.`)
@@ -160,7 +161,7 @@ export function run(argv: string[], root = process.cwd()): number {
     }
 
     case 'reconcile': {
-      if (!sub) throw new UsageError('Usage: opos reconcile <slug> [--git-diff] [--base <ref>] [--json] [--strict]')
+      if (!sub) throw new UsageError('Usage: polaris reconcile <slug> [--git-diff] [--base <ref>] [--json] [--strict]')
       const s = loadSpec(root, sub)
       const report = reconcile(root, s, { gitDiff: has(args, 'git-diff') || has(args, 'base'), base: flag(args, 'base') })
       log(has(args, 'json') ? JSON.stringify(report, null, 2) : formatReport(report))
@@ -169,7 +170,7 @@ export function run(argv: string[], root = process.cwd()): number {
     }
 
     default:
-      throw new UsageError(`Unknown command "${cmd}". Run \`opos help\`.`)
+      throw new UsageError(`Unknown command "${cmd}". Run \`polaris help\`.`)
   }
 }
 
@@ -197,13 +198,13 @@ function doctor(root: string, log: (s?: string) => void): number {
 
   const agents = detectAgents(root)
   const installed = [
-    existsSync(join(root, '.claude', 'skills', 'opos-spec')) && 'claude',
-    existsSync(join(root, '.cursor', 'rules', 'opos-spec.mdc')) && 'cursor',
-    existsSync(join(root, '.operator-os', 'skills', 'spec.md')) && 'codex',
+    existsSync(join(root, '.claude', 'skills', 'polaris-spec')) && 'claude',
+    existsSync(join(root, '.cursor', 'rules', 'polaris-spec.mdc')) && 'cursor',
+    existsSync(join(root, '.polaris', 'skills', 'spec.md')) && 'codex',
   ].filter(Boolean)
-  line(installed.length ? true : 'warn', installed.length ? `agent workflows installed: ${installed.join(', ')}` : `no agent workflows installed${agents.length ? ` (found ${agents.join(', ')}: run \`opos setup ${agents[0]}\`)` : ''}`)
+  line(installed.length ? true : 'warn', installed.length ? `agent workflows installed: ${installed.join(', ')}` : `no agent workflows installed${agents.length ? ` (found ${agents.join(', ')}: run \`polaris setup ${agents[0]}\`)` : ''}`)
   log()
-  log(problems ? `${problems} problem(s). Fix them, then run \`opos doctor\` again.` : 'Ready.')
+  log(problems ? `${problems} problem(s). Fix them, then run \`polaris doctor\` again.` : 'Ready.')
   return problems ? 1 : 0
 }
 
@@ -231,7 +232,7 @@ function init(root: string, args: Args, log: (s?: string) => void): number {
     if (!AGENTS.includes(a)) throw new UsageError(`Unknown agent "${a}". Use one of ${AGENTS.join(', ')}.`)
     log(`Installed ${setupAgent(root, a).length} ${a} workflow file(s)`)
   }
-  if (!agents.length) log('No coding agent detected. Run `opos setup claude|cursor|codex` when you have one.')
+  if (!agents.length) log('No coding agent detected. Run `polaris setup claude|cursor|codex` when you have one.')
 
   log()
   log(firstMove(root))
@@ -251,9 +252,9 @@ export function firstMove(root: string): string {
   }
   if (!specs.length) {
     const p = ctx.priorities[0]
-    return `First move: ask your agent for /opos-spec on something small that serves "${p ?? 'your top priority'}", or run:\n  opos spec new "<title>"${p ? ` --priority "${p}"` : ''}`
+    return `First move: ask your agent for /polaris-spec on something small that serves "${p ?? 'your top priority'}", or run:\n  polaris spec new "<title>"${p ? ` --priority "${p}"` : ''}`
   }
-  return `First move: you have ${specs.length} spec(s). Run \`opos status\` to see where each one stands.`
+  return `First move: you have ${specs.length} spec(s). Run \`polaris status\` to see where each one stands.`
 }
 
 function status(root: string, log: (s?: string) => void): number {
@@ -268,7 +269,7 @@ function status(root: string, log: (s?: string) => void): number {
     const live = s.tasks.filter(t => t.status !== 'dropped')
     log(`${slug.padEnd(32)} ${String(s.meta.status).padEnd(9)} ${count(t => t.status === 'done')}/${live.length} done` +
       `${count(t => t.status === 'done' && !(t.evidence ?? []).length) ? `, ${count(t => t.status === 'done' && !(t.evidence ?? []).length)} without proof` : ''}` +
-      `${count(t => t.origin === 'proposed' && t.status === 'todo') ? `, ${count(t => t.origin === 'proposed' && t.status === 'todo')} awaiting decision` : ''}` +
+      `${count(t => t.origin === 'prpolarised' && t.status === 'todo') ? `, ${count(t => t.origin === 'prpolarised' && t.status === 'todo')} awaiting decision` : ''}` +
       `${s.meta.priority ? `  · ${s.meta.priority}` : ''}`)
   }
   return 0
@@ -278,7 +279,7 @@ function spec(root: string, sub: string | undefined, rest: string[], args: Args,
   switch (sub) {
     case 'new': {
       const title = rest[0]
-      if (!title) throw new UsageError('Usage: opos spec new "<title>" [--priority p] [--decision d] [--stakeholder name]...')
+      if (!title) throw new UsageError('Usage: polaris spec new "<title>" [--priority p] [--decision d] [--stakeholder name]...')
       const ctx = loadContext(root)
       const dir = createSpec(root, ctx, {
         title,
@@ -297,7 +298,7 @@ function spec(root: string, sub: string | undefined, rest: string[], args: Args,
       listSpecs(root).forEach(s => log(s))
       return 0
     case 'show': {
-      if (!rest[0]) throw new UsageError('Usage: opos spec show <slug>')
+      if (!rest[0]) throw new UsageError('Usage: polaris spec show <slug>')
       const s = loadSpec(root, rest[0])
       log(readFileSync(join(s.dir, 'spec.md'), 'utf8'))
       log('--- tasks.yaml ---')
@@ -306,7 +307,7 @@ function spec(root: string, sub: string | undefined, rest: string[], args: Args,
     }
     case 'check': {
       const slugs = has(args, 'all') ? listSpecs(root) : rest[0] ? [rest[0]] : []
-      if (!slugs.length) throw new UsageError('Usage: opos spec check <slug> | --all')
+      if (!slugs.length) throw new UsageError('Usage: polaris spec check <slug> | --all')
       const ctx = loadContext(root)
       let errors = 0
       for (const slug of slugs) {
@@ -318,13 +319,13 @@ function spec(root: string, sub: string | undefined, rest: string[], args: Args,
       return errors ? 1 : 0
     }
     default:
-      throw new UsageError('Usage: opos spec <new|list|show|check>')
+      throw new UsageError('Usage: polaris spec <new|list|show|check>')
   }
 }
 
 function task(root: string, sub: string | undefined, rest: string[], args: Args, log: (s?: string) => void): number {
   const [slug, arg] = rest
-  if (!slug || !arg) throw new UsageError('Usage: opos task add <slug> "<title>" | opos task set <slug> <id> ...')
+  if (!slug || !arg) throw new UsageError('Usage: polaris task add <slug> "<title>" | polaris task set <slug> <id> ...')
   const s = loadSpec(root, slug)
 
   if (sub === 'add') {
@@ -362,7 +363,7 @@ function task(root: string, sub: string | undefined, rest: string[], args: Args,
     log(`${t.id}: ${t.status}${t.status === 'done' && !(t.evidence ?? []).length ? ' (proof pending: add --evidence)' : ''}`)
     return 0
   }
-  throw new UsageError('Usage: opos task <add|set> ...')
+  throw new UsageError('Usage: polaris task <add|set> ...')
 }
 
 // Global installs run through a symlink in the npm bin directory.

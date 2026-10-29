@@ -22,7 +22,7 @@ const silent = fn => {
 }
 
 function project() {
-  const root = mkdtempSync(join(tmpdir(), 'opos-'))
+  const root = mkdtempSync(join(tmpdir(), 'polaris-'))
   const sh = (...a) => execFileSync('git', a, { cwd: root, stdio: 'ignore' })
   sh('init', '-q')
   sh('config', 'user.email', 't@example.com')
@@ -63,17 +63,17 @@ test('globs', () => {
 })
 
 test('init scaffolds context, config and agent workflows', () => {
-  const root = mkdtempSync(join(tmpdir(), 'opos-'))
+  const root = mkdtempSync(join(tmpdir(), 'polaris-'))
   mkdirSync(join(root, '.claude'))
   const { code } = silent(() => run(['init'], root))
   assert.equal(code, 0)
   for (const f of ['me.md', 'company.md', 'style.md', 'decisions.md', 'people.md']) {
     assert.ok(existsSync(join(root, '.operator-os', f)), f)
   }
-  assert.ok(existsSync(join(root, 'opos.config.json')))
-  const skill = readFileSync(join(root, '.claude/skills/opos-spec/SKILL.md'), 'utf8')
-  assert.match(skill, /^---\nname: opos-spec\ndescription: "/)
-  assert.match(skill, /opos context/)
+  assert.ok(existsSync(join(root, 'polaris.config.json')))
+  const skill = readFileSync(join(root, '.claude/skills/polaris-spec/SKILL.md'), 'utf8')
+  assert.match(skill, /^---\nname: polaris-spec\ndescription: "/)
+  assert.match(skill, /polaris context/)
 })
 
 test('spec check links the spec to the operator context', () => {
@@ -103,7 +103,7 @@ test('reconcile separates proof, pending decisions and drift', () => {
   const root = project()
   silent(() => run(['spec', 'new', 'Saved filters', '--priority', 'onboarding time'], root))
   silent(() => run(['task', 'add', 'saved-filters', 'Persist filters', '--files', 'src/filters/**', '--check', 'survives reload'], root))
-  silent(() => run(['task', 'add', 'saved-filters', 'Share filters', '--origin', 'proposed'], root))
+  silent(() => run(['task', 'add', 'saved-filters', 'Share filters', '--origin', 'prpolarised'], root))
   mkdirSync(join(root, 'src/filters'), { recursive: true })
   writeFileSync(join(root, 'src/filters/store.ts'), 'a')
   writeFileSync(join(root, 'src/unrelated.ts'), 'b')
@@ -114,7 +114,7 @@ test('reconcile separates proof, pending decisions and drift', () => {
   assert.equal(r.code, 1)
   assert.deepEqual(report.proofPending.map(t => t.id), ['T1'])
   assert.deepEqual(report.awaitingDecision.map(t => t.id), ['T2'])
-  assert.deepEqual(report.drift, ['src/unrelated.ts'], 'opos files and claimed files are not drift')
+  assert.deepEqual(report.drift, ['src/unrelated.ts'], 'polaris files and claimed files are not drift')
 
   silent(() => run(['task', 'set', 'saved-filters', 'T1', '--evidence', 'test:npm test -- filters'], root))
   silent(() => run(['task', 'set', 'saved-filters', 'T2', '--status', 'dropped'], root))
@@ -132,12 +132,12 @@ test('reconcile separates proof, pending decisions and drift', () => {
 })
 
 test('codex setup keeps the rest of AGENTS.md intact', () => {
-  const root = mkdtempSync(join(tmpdir(), 'opos-'))
+  const root = mkdtempSync(join(tmpdir(), 'polaris-'))
   writeFileSync(join(root, 'AGENTS.md'), '# House rules\n\nUse tabs.\n')
   silent(() => run(['setup', 'codex'], root))
   silent(() => run(['setup', 'codex'], root))
   const md = readFileSync(join(root, 'AGENTS.md'), 'utf8')
   assert.match(md, /^# House rules\n\nUse tabs\./)
-  assert.equal(md.match(/opos:start/g).length, 1)
-  assert.ok(existsSync(join(root, '.operator-os/skills/spec.md')))
+  assert.equal(md.match(/polaris:start/g).length, 1)
+  assert.ok(existsSync(join(root, '.polaris/skills/spec.md')))
 })

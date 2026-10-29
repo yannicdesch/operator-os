@@ -31,8 +31,8 @@ export function changedFiles(root: string, base?: string): string[] | null {
   return [...files].sort()
 }
 
-// Files opos itself writes: specs, context, config and installed workflows are never drift.
-function oposOwned(root: string): string[] {
+// Files polaris itself writes: specs, context, config and installed workflows are never drift.
+function polarisOwned(root: string): string[] {
   const cfg = loadConfig(root)
   const dir = (p: string) => (p === '.' ? null : `${relative(root, join(root, p)).replace(/\\/g, '/')}/**`)
   return [
@@ -40,9 +40,9 @@ function oposOwned(root: string): string[] {
     dir(cfg.contextDir),
     ...(cfg.contextDir === '.' ? ['me.md', 'company.md', 'style.md', 'decisions.md', 'people.md'] : []),
     CONFIG_FILE,
-    '.operator-os/**',
-    '.claude/skills/opos-*/**',
-    '.cursor/rules/opos-*.mdc',
+    '.polaris/**',
+    '.claude/skills/polaris-*/**',
+    '.cursor/rules/polaris-*.mdc',
     'AGENTS.md',
   ].filter((g): g is string => !!g)
 }
@@ -54,8 +54,8 @@ export function reconcile(root: string, spec: Spec, opts: ReconcileOptions): Rec
     proven: live.filter(t => t.status === 'done' && (t.evidence ?? []).length > 0),
     proofPending: live.filter(t => t.status === 'done' && !(t.evidence ?? []).length),
     inProgress: live.filter(t => t.status === 'doing'),
-    notStarted: live.filter(t => t.status === 'todo' && t.origin !== 'proposed'),
-    awaitingDecision: live.filter(t => t.origin === 'proposed' && t.status === 'todo'),
+    notStarted: live.filter(t => t.status === 'todo' && t.origin !== 'prpolarised'),
+    awaitingDecision: live.filter(t => t.origin === 'prpolarised' && t.status === 'todo'),
     discovered: live.filter(t => t.origin === 'discovered'),
     drift: [],
     changedFiles: [],
@@ -66,7 +66,7 @@ export function reconcile(root: string, spec: Spec, opts: ReconcileOptions): Rec
     const files = changedFiles(root, opts.base)
     if (files === null) throw new Error('--git-diff needs a git repository.')
     const claimed = live.flatMap(t => t.files ?? [])
-    report.changedFiles = files.filter(f => !matchesAny(f, oposOwned(root)))
+    report.changedFiles = files.filter(f => !matchesAny(f, polarisOwned(root)))
     report.drift = report.changedFiles.filter(f => !matchesAny(f, claimed))
   }
 
@@ -89,7 +89,7 @@ export function formatReport(r: ReconcileReport): string {
   block('Done, proof pending: marked done without evidence', list(r.proofPending))
   block('In progress', list(r.inProgress))
   block('Not started', list(r.notStarted))
-  block('Waiting for your decision (proposed, not agreed)', list(r.awaitingDecision))
+  block('Waiting for your decision (prpolarised, not agreed)', list(r.awaitingDecision))
   block('Discovered while building: check these belong in scope', list(r.discovered))
   block('Drift: changed files no task claims', r.drift.map(f => `  ${f}`).join('\n'))
 

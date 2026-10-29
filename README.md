@@ -42,41 +42,43 @@ A capable model can do all of this if you brief it carefully every time. Operato
 | Switching tools | Re-explain everything | Same five files in Claude, ChatGPT, Cursor, anywhere |
 | Handoff to a person or agent | Lives in your head | Lives in the repo; onboarding takes minutes |
 
-## Operator OS for coding agents: `opos`
+## Polaris: Operator OS for coding agents
 
-The five files are the memory. `opos` is what a coding agent does with it.
+The five files are the memory. Polaris (`polaris` on the command line) is what a coding agent does with it: it keeps the agent pointed at the work that matters to you.
 
 Coding agents build fast. Keeping them pointed at the right problem takes work: explaining the goal, challenging assumptions, checking the result, and picking up the thread in the next session. Product harnesses solve part of that by turning the work into a spec the agent builds against. What they cannot know is *why* the work matters to you: which priority it serves, which decision it feeds, which decision is already closed, and who will push back.
 
-`opos` adds exactly that. Every workflow reads your five files first, and every spec is checked against them.
+Polaris adds exactly that. Every workflow reads your five files first, and every spec is checked against them.
 
 ```
-npm install -g operator-os
+npm install -g @yannicdesch/polaris
 cd /path/to/your/project
-opos init          # context files, config, agent workflows, a suggested first move
-opos doctor
+polaris init          # context files, config, agent workflows, a suggested first move
+polaris doctor
 ```
 
 Then talk to your coding agent the way you already do, and name a workflow:
 
 ```
-/opos-spec New customers need three calls before they can use the product. Find what we can cut.
+/polaris-spec New customers need three calls before they can use the product. Find what we can cut.
 ```
 
 ### How it works
 
 ```
-  SIGNAL                      SHAPE                          BUILD + PROVE
-  ──────                      ─────                          ─────────────
-  an idea or request  ──▶  /opos-interview-me           ──▶  /opos-build
-  customer material   ──▶  /opos-discovery    ┐              tasks.yaml stays honest
-  public research     ──▶  /opos-research     ├──▶ spec       │
-  "should we?"        ──▶  /opos-pitch        ┘   [you agree] ▼
-                           /opos-roast, /opos-preview      opos reconcile --git-diff
-                                                           drift or proof ──▶ [you approve]
-          ▲                                        │
-          └──────── me.md · company.md · decisions.md · people.md · style.md ─┘
-                    read by every step, checked by `opos spec check`
+  SIGNAL                  SHAPE                              BUILD + PROVE
+  ──────                  ─────                              ─────────────
+  an idea or request ──▶  /polaris-interview-me  ┐
+  customer material  ──▶  /polaris-discovery     │
+  public research    ──▶  /polaris-research      ├──▶ spec ──▶ /polaris-build
+  "should we?"       ──▶  /polaris-pitch         ┘  [you agree]  tasks.yaml stays honest
+                          /polaris-roast                          │
+                          /polaris-preview                        ▼
+                                                     polaris reconcile --git-diff
+                                                     drift or proof ──▶ [you approve]
+
+  Every step reads me.md · company.md · decisions.md · people.md · style.md
+  and `polaris spec check` holds each spec against them.
 ```
 
 A spec is three plain files in `specs/<slug>/`, so the next agent (or person) continues from the recorded state:
@@ -84,12 +86,12 @@ A spec is three plain files in `specs/<slug>/`, so the next agent (or person) co
 | File | What it keeps |
 |---|---|
 | `spec.md` | Problem, context, scope in and out, decisions, open questions, acceptance. Frontmatter links the **priority** from `me.md`, the **decision** from `decisions.md` and the **stakeholders** from `people.md`. |
-| `tasks.yaml` | Tasks with status, `files` they may touch, acceptance `checks` and `evidence`. Each task is `agreed`, `proposed` (waits for your call) or `discovered` (found while building). |
+| `tasks.yaml` | Tasks with status, `files` they may touch, acceptance `checks` and `evidence`. Each task is `agreed`, `prpolarised` (waits for your call) or `discovered` (found while building). |
 | `events.jsonl` | The record of what happened. |
 
 ### What the context adds
 
-| | Bare coding agent | Product harness | `opos` |
+| | Bare coding agent | Product harness | Polaris |
 |---|---|---|---|
 | Starting point | Your prompt | An agreed spec | An agreed spec tied to a current priority and an open decision |
 | "Should we build this?" | Whatever you ask it to consider | A GO / NO-GO case | The case in your company's numbers, with a kill criterion |
@@ -101,19 +103,19 @@ A spec is three plain files in `specs/<slug>/`, so the next agent (or person) co
 
 | When you want to… | Use |
 |---|---|
-| Set up a project and get a first move | `opos init` |
-| Check your setup and how fresh your context is | `opos doctor` |
-| Print the context an agent reads | `opos context` |
-| Start a spec | `opos spec new "<title>" --priority "…" --decision "…" --stakeholder "…"` |
-| Validate a spec against structure and context | `opos spec check <slug>` (or `--all`) |
-| Track work | `opos task add`, `opos task set <slug> T1 --status done --evidence test:"npm test"` |
-| Compare the build with the agreement | `opos reconcile <slug> --git-diff [--base main] [--strict]` |
-| See where every spec stands | `opos status` |
-| Install workflows for an agent | `opos setup claude`, `opos setup cursor`, `opos setup codex` |
+| Set up a project and get a first move | `polaris init` |
+| Check your setup and how fresh your context is | `polaris doctor` |
+| Print the context an agent reads | `polaris context` |
+| Start a spec | `polaris spec new "<title>" --priority "…" --decision "…" --stakeholder "…"` |
+| Validate a spec against structure and context | `polaris spec check <slug>` (or `--all`) |
+| Track work | `polaris task add`, `polaris task set <slug> T1 --status done --evidence test:"npm test"` |
+| Compare the build with the agreement | `polaris reconcile <slug> --git-diff [--base main] [--strict]` |
+| See where every spec stands | `polaris status` |
+| Install workflows for an agent | `polaris setup claude`, `polaris setup cursor`, `polaris setup codex` |
 
-Agent workflows: `interview-me`, `spec`, `roast`, `pitch`, `ideate`, `research`, `discovery`, `preview`, `build`, `reconcile`. In Claude Code they are skills (`/opos-spec`), in Cursor rules, for Codex and other agents a block in `AGENTS.md` that points to `.operator-os/skills/`.
+Agent workflows: `interview-me`, `spec`, `roast`, `pitch`, `ideate`, `research`, `discovery`, `preview`, `build`, `reconcile`. In Claude Code they are skills (`/polaris-spec`), in Cursor rules, for Codex and other agents a block in `AGENTS.md` that points to `.polaris/skills/`.
 
-`opos` runs locally and needs no account. Your coding agent and model provider still see what you give them; keep confidential numbers in a private copy of the context files. The checks help you review agent work. They are not a sandbox and cannot guarantee what an agent does.
+Polaris runs locally and needs no account. Your coding agent and model provider still see what you give them; keep confidential numbers in a private copy of the context files. The checks help you review agent work. They are not a sandbox and cannot guarantee what an agent does.
 
 ## Getting started with the five files
 
@@ -172,12 +174,12 @@ Operator OS doesn't change how your AI works. It changes what your AI knows. A c
 ## Roadmap
 
 - **Operator workflows.** `board-prep`, `weekly-review`, `decision-memo` and a 100-day plan, built on the same context, for work that is not a code change.
-- **Decision loop.** `opos` proposes the exact `decisions.md` entry when a pitch or spec closes a decision; the next step is applying it with your approval.
+- **Decision loop.** `polaris` prpolarises the exact `decisions.md` entry when a pitch or spec closes a decision; the next step is applying it with your approval.
 - **Team layout.** A documented pattern for one shared `company.md` plus private per-person files.
 
 ## Acknowledgments
 
-`opos` is inspired by [productfoo](https://github.com/rwo572/productfoo) by Rachel Wolan, an agentic product management harness for coding agents. The spec-plus-reconcile shape comes from there; the code and workflows here are written independently, and the context layer is what Operator OS adds.
+Polaris is inspired by [productfoo](https://github.com/rwo572/productfoo) by Rachel Wolan, an agentic product management harness for coding agents. The spec-plus-reconcile shape comes from there; the code and workflows here are written independently, and the context layer is what Operator OS adds.
 
 ## Status
 

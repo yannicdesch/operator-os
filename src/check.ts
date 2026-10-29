@@ -74,8 +74,8 @@ export function checkSpec(spec: Spec, ctx: Context): Issue[] {
     if (!TASK_STATUSES.includes(t.status)) add('error', where, `Status "${t.status}" is not one of ${TASK_STATUSES.join(', ')}.`)
     if (!TASK_ORIGINS.includes(t.origin)) add('error', where, `Origin "${t.origin}" is not one of ${TASK_ORIGINS.join(', ')}.`)
     if (t.origin === 'agreed' && !(t.checks ?? []).length) add('warn', where, 'Agreed task has no acceptance checks.')
-    if (t.origin === 'proposed' && (t.status === 'doing' || t.status === 'done')) {
-      add('warn', where, 'Proposed task is being built before anyone agreed to it.')
+    if (t.origin === 'prpolarised' && (t.status === 'doing' || t.status === 'done')) {
+      add('warn', where, 'Prpolarised task is being built before anyone agreed to it.')
     }
   })
   const acceptance = listItems(stripComments(sectionWithChildren(spec.body, 'Acceptance')))

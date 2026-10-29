@@ -6,9 +6,9 @@ import { sections, slugify, today } from './util.js'
 
 export const SPEC_STATUSES = ['draft', 'agreed', 'building', 'done', 'parked'] as const
 export const TASK_STATUSES = ['todo', 'doing', 'done', 'dropped'] as const
-// agreed: part of the spec you signed off. proposed: waits for your call.
+// agreed: part of the spec you signed off. prpolarised: waits for your call.
 // discovered: necessary work the agent found while building.
-export const TASK_ORIGINS = ['agreed', 'proposed', 'discovered'] as const
+export const TASK_ORIGINS = ['agreed', 'prpolarised', 'discovered'] as const
 
 export const REQUIRED_SECTIONS = ['Problem', 'Context', 'Scope', 'Decisions', 'Open questions', 'Acceptance'] as const
 
@@ -63,7 +63,7 @@ export function resolveSpecDir(root: string, ref: string): string {
   if (existsSync(join(direct, 'spec.md'))) return direct
   const bySlug = join(specsRoot(root), ref)
   if (existsSync(join(bySlug, 'spec.md'))) return bySlug
-  throw new Error(`No spec found at "${ref}". Run \`opos spec list\` to see what exists.`)
+  throw new Error(`No spec found at "${ref}". Run \`polaris spec list\` to see what exists.`)
 }
 
 export function parseFrontmatter(md: string): { meta: Record<string, unknown>; body: string } {
@@ -90,26 +90,26 @@ export function saveTasks(spec: Spec): void {
   writeFileSync(join(spec.dir, 'tasks.yaml'), TASKS_HEADER + YAML.stringify({ tasks: spec.tasks }))
 }
 
-export interface OposEvent {
+export interface PolarisEvent {
   ts: string
   type: string
   by: string
   [key: string]: unknown
 }
 
-export function appendEvent(dir: string, type: string, data: Record<string, unknown> = {}, by = 'opos'): OposEvent {
-  const event: OposEvent = { ts: new Date().toISOString(), type, by, ...data }
+export function appendEvent(dir: string, type: string, data: Record<string, unknown> = {}, by = 'polaris'): PolarisEvent {
+  const event: PolarisEvent = { ts: new Date().toISOString(), type, by, ...data }
   appendFileSync(join(dir, 'events.jsonl'), JSON.stringify(event) + '\n')
   return event
 }
 
-export function readEvents(dir: string): OposEvent[] {
+export function readEvents(dir: string): PolarisEvent[] {
   const path = join(dir, 'events.jsonl')
   if (!existsSync(path)) return []
   return readFileSync(path, 'utf8')
     .split('\n')
     .filter(Boolean)
-    .map(l => JSON.parse(l) as OposEvent)
+    .map(l => JSON.parse(l) as PolarisEvent)
 }
 
 export function specSections(spec: Spec): string[] {
@@ -119,7 +119,7 @@ export function specSections(spec: Spec): string[] {
 }
 
 const TASKS_HEADER = `# status: todo | doing | done | dropped
-# origin: agreed (in the spec you signed off) | proposed (waits for your call) | discovered (found while building)
+# origin: agreed (in the spec you signed off) | prpolarised (waits for your call) | discovered (found while building)
 # files: globs this task is allowed to touch; reconcile flags changes no task claims
 # evidence: proof that a check passed, e.g. { type: test, ref: "npm test -- filters" }
 `

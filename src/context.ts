@@ -5,7 +5,7 @@ import { countPlaceholders, git, listItems, readIfExists, sections, stripComment
 export const CONTEXT_FILES = ['me.md', 'company.md', 'style.md', 'decisions.md', 'people.md'] as const
 export type ContextFile = (typeof CONTEXT_FILES)[number]
 
-export const CONFIG_FILE = 'opos.config.json'
+export const CONFIG_FILE = 'polaris.config.json'
 
 export interface Config {
   contextDir: string

@@ -1,6 +1,6 @@
 ---
 name: interview-me
-description: Resolve the questions that change the work before a spec is written. Use when a request is vague, when the operator says "interview me", or before opos-spec on anything bigger than a small change.
+description: Resolve the questions that change the work before a spec is written. Use when a request is vague, when the operator says "interview me", or before polaris-spec on anything bigger than a small change.
 ---
 
 # Interview me
@@ -11,4 +11,4 @@ Goal: find the few answers that change what gets built, and nothing else.
 2. List every question you would need answered to build this well. Then delete each one that the code, the context files or a sensible default already answers. Write down the default you picked.
 3. Ask the remaining questions one at a time, most consequential first. For each, say why it matters and offer your recommended answer, so the operator can reply with "yes".
 4. Stop when the remaining unknowns would not change the scope, the data model or who is affected.
-5. Hand over a short summary: decisions made, defaults assumed, questions parked (with who in `people.md` could answer them). Offer to continue with opos-spec.
+5. Hand over a short summary: decisions made, defaults assumed, questions parked (with who in `people.md` could answer them). Offer to continue with polaris-spec.

@@ -28,8 +28,8 @@ export function loadSkills(packageRoot = PACKAGE_ROOT): Skill[] {
     })
 }
 
-const AGENTS_MD_START = '<!-- opos:start -->'
-const AGENTS_MD_END = '<!-- opos:end -->'
+const AGENTS_MD_START = '<!-- polaris:start -->'
+const AGENTS_MD_END = '<!-- polaris:end -->'
 
 // Returns the files written, relative to root.
 export function setupAgent(root: string, agent: Agent, skills = loadSkills()): string[] {
@@ -43,25 +43,25 @@ export function setupAgent(root: string, agent: Agent, skills = loadSkills()): s
 
   if (agent === 'claude') {
     for (const s of skills) {
-      write(join('.claude', 'skills', `opos-${s.name}`, 'SKILL.md'), `---\nname: opos-${s.name}\ndescription: ${JSON.stringify(s.description)}\n---\n\n${s.body}`)
+      write(join('.claude', 'skills', `polaris-${s.name}`, 'SKILL.md'), `---\nname: polaris-${s.name}\ndescription: ${JSON.stringify(s.description)}\n---\n\n${s.body}`)
     }
   }
 
   if (agent === 'cursor') {
     for (const s of skills) {
-      write(join('.cursor', 'rules', `opos-${s.name}.mdc`), `---\ndescription: ${JSON.stringify(s.description)}\nalwaysApply: false\n---\n\n${s.body}`)
+      write(join('.cursor', 'rules', `polaris-${s.name}.mdc`), `---\ndescription: ${JSON.stringify(s.description)}\nalwaysApply: false\n---\n\n${s.body}`)
     }
   }
 
   if (agent === 'codex') {
-    for (const s of skills) write(join('.operator-os', 'skills', `${s.name}.md`), s.body)
+    for (const s of skills) write(join('.polaris', 'skills', `${s.name}.md`), s.body)
     const block = [
       AGENTS_MD_START,
       '## Operator OS workflows',
       '',
-      'This project uses Operator OS (`opos`). Run `opos context` before product work. When a request matches one of these workflows, read the file and follow it:',
+      'This project uses Operator OS (`polaris`). Run `polaris context` before product work. When a request matches one of these workflows, read the file and follow it:',
       '',
-      ...skills.map(s => `- \`.operator-os/skills/${s.name}.md\`: ${s.description}`),
+      ...skills.map(s => `- \`.polaris/skills/${s.name}.md\`: ${s.description}`),
       AGENTS_MD_END,
     ].join('\n')
     const path = join(root, 'AGENTS.md')
