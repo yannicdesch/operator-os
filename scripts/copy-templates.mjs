@@ -1,5 +1,5 @@
 // The five context files at the repo root are the source of truth.
-// `polaris init` scaffolds from a copy shipped in the package.
+// `bearing init` scaffolds from a copy shipped in the package.
 import { copyFileSync, mkdirSync } from 'node:fs'
 
 const FILES = ['me.md', 'company.md', 'style.md', 'decisions.md', 'people.md']

@@ -9,4 +9,4 @@ description: Build a reviewable artifact (clickable HTML mock, sample output, AP
 2. Build it in `specs/<slug>/preview/`. It must not touch production code.
 3. Cover the main path and the one edge case most likely to change the design.
 4. Show it, collect feedback, and turn each piece of feedback into a proposed change to spec.md or tasks.yaml. The operator accepts or rejects each.
-5. Log `polaris event <slug> preview.reviewed`.
+5. Log `bearing event <slug> preview.reviewed`.

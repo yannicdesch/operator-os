@@ -1,7 +1,7 @@
 {
-  "name": "@yannicdesch/polaris",
+  "name": "@yannicdesch/bearing",
   "version": "0.1.0",
-  "description": "Polaris: a product and decision harness for coding agents, built on Operator OS. Specs that know your priorities, your open decisions and your stakeholders.",
+  "description": "Bearing: a product and decision harness for coding agents, built on Operator OS. Specs that know your priorities, your open decisions and your stakeholders.",
   "license": "MIT",
   "author": "Yannic Desch (https://yannicdesch.com)",
   "repository": {
@@ -10,7 +10,7 @@
   },
   "type": "module",
   "bin": {
-    "polaris": "dist/cli.js"
+    "bearing": "dist/cli.js"
   },
   "files": [
     "dist",

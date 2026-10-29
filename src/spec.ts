@@ -63,7 +63,7 @@ export function resolveSpecDir(root: string, ref: string): string {
   if (existsSync(join(direct, 'spec.md'))) return direct
   const bySlug = join(specsRoot(root), ref)
   if (existsSync(join(bySlug, 'spec.md'))) return bySlug
-  throw new Error(`No spec found at "${ref}". Run \`polaris spec list\` to see what exists.`)
+  throw new Error(`No spec found at "${ref}". Run \`bearing spec list\` to see what exists.`)
 }
 
 export function parseFrontmatter(md: string): { meta: Record<string, unknown>; body: string } {
@@ -90,26 +90,26 @@ export function saveTasks(spec: Spec): void {
   writeFileSync(join(spec.dir, 'tasks.yaml'), TASKS_HEADER + YAML.stringify({ tasks: spec.tasks }))
 }
 
-export interface PolarisEvent {
+export interface BearingEvent {
   ts: string
   type: string
   by: string
   [key: string]: unknown
 }
 
-export function appendEvent(dir: string, type: string, data: Record<string, unknown> = {}, by = 'polaris'): PolarisEvent {
-  const event: PolarisEvent = { ts: new Date().toISOString(), type, by, ...data }
+export function appendEvent(dir: string, type: string, data: Record<string, unknown> = {}, by = 'bearing'): BearingEvent {
+  const event: BearingEvent = { ts: new Date().toISOString(), type, by, ...data }
   appendFileSync(join(dir, 'events.jsonl'), JSON.stringify(event) + '\n')
   return event
 }
 
-export function readEvents(dir: string): PolarisEvent[] {
+export function readEvents(dir: string): BearingEvent[] {
   const path = join(dir, 'events.jsonl')
   if (!existsSync(path)) return []
   return readFileSync(path, 'utf8')
     .split('\n')
     .filter(Boolean)
-    .map(l => JSON.parse(l) as PolarisEvent)
+    .map(l => JSON.parse(l) as BearingEvent)
 }
 
 export function specSections(spec: Spec): string[] {

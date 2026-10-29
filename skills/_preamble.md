@@ -1,6 +1,6 @@
 ## Before anything else: load the operator's context
 
-Run `polaris context` and read the output. It holds the five Operator OS files:
+Run `bearing context` and read the output. It holds the five Operator OS files:
 
 - `me.md`: role, what they own, current priorities, how they want you to work
 - `company.md`: product, customers, strategy, the numbers that matter
@@ -8,7 +8,7 @@ Run `polaris context` and read the output. It holds the five Operator OS files:
 - `decisions.md`: open decisions (feed them) and recently closed ones (never reopen them unasked)
 - `people.md`: who has a stake and what each person cares about
 
-Rules that hold in every polaris workflow:
+Rules that hold in every bearing workflow:
 
 - Inspect the repository and the context before asking. Ask only what neither can answer.
 - Tie work to a priority in `me.md` or say plainly that it serves none.

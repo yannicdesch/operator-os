@@ -31,8 +31,8 @@ export function changedFiles(root: string, base?: string): string[] | null {
   return [...files].sort()
 }
 
-// Files polaris itself writes: specs, context, config and installed workflows are never drift.
-function polarisOwned(root: string): string[] {
+// Files bearing itself writes: specs, context, config and installed workflows are never drift.
+function bearingOwned(root: string): string[] {
   const cfg = loadConfig(root)
   const dir = (p: string) => (p === '.' ? null : `${relative(root, join(root, p)).replace(/\\/g, '/')}/**`)
   return [
@@ -40,9 +40,9 @@ function polarisOwned(root: string): string[] {
     dir(cfg.contextDir),
     ...(cfg.contextDir === '.' ? ['me.md', 'company.md', 'style.md', 'decisions.md', 'people.md'] : []),
     CONFIG_FILE,
-    '.polaris/**',
-    '.claude/skills/polaris-*/**',
-    '.cursor/rules/polaris-*.mdc',
+    '.bearing/**',
+    '.claude/skills/bearing-*/**',
+    '.cursor/rules/bearing-*.mdc',
     'AGENTS.md',
   ].filter((g): g is string => !!g)
 }
@@ -66,7 +66,7 @@ export function reconcile(root: string, spec: Spec, opts: ReconcileOptions): Rec
     const files = changedFiles(root, opts.base)
     if (files === null) throw new Error('--git-diff needs a git repository.')
     const claimed = live.flatMap(t => t.files ?? [])
-    report.changedFiles = files.filter(f => !matchesAny(f, polarisOwned(root)))
+    report.changedFiles = files.filter(f => !matchesAny(f, bearingOwned(root)))
     report.drift = report.changedFiles.filter(f => !matchesAny(f, claimed))
   }
 
