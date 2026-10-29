@@ -1,0 +1,37 @@
+{
+  "name": "operator-os",
+  "version": "0.1.0",
+  "description": "Operator OS: a product and decision harness for coding agents that knows your company, your priorities and your open decisions.",
+  "license": "MIT",
+  "author": "Yannic Desch (https://yannicdesch.com)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yannicdesch/operator-os.git"
+  },
+  "type": "module",
+  "bin": {
+    "opos": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "skills",
+    "templates",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && node scripts/copy-templates.mjs",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "prepublishOnly": "npm test"
+  },
+  "dependencies": {
+    "yaml": "^2.5.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "typescript": "^5.5.4"
+  }
+}
