@@ -141,3 +141,14 @@ test('codex setup keeps the rest of AGENTS.md intact', () => {
   assert.equal(md.match(/bearing:start/g).length, 1)
   assert.ok(existsSync(join(root, '.bearing/skills/spec.md')))
 })
+
+test('init honours an absolute contextDir outside the project', () => {
+  const root = mkdtempSync(join(tmpdir(), 'bearing-'))
+  const ctxDir = mkdtempSync(join(tmpdir(), 'bearing-ctx-'))
+  writeFileSync(join(ctxDir, 'me.md'), '# me.md\n## Current quarter priorities\n1. Mine\n')
+  writeFileSync(join(root, 'bearing.config.json'), JSON.stringify({ contextDir: ctxDir, specsDir: 'specs' }))
+  silent(() => run(['init'], root))
+  assert.equal(readFileSync(join(ctxDir, 'me.md'), 'utf8'), '# me.md\n## Current quarter priorities\n1. Mine\n', 'existing file kept')
+  assert.ok(existsSync(join(ctxDir, 'decisions.md')), 'missing files created in the configured dir')
+  assert.ok(!existsSync(join(root, ctxDir.replace(/^\//, ''))), 'nothing created inside the project')
+})
