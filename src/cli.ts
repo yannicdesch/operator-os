@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { existsSync, mkdirSync, readFileSync, realpathSync, writeFileSync } from 'node:fs'
-import { join, relative } from 'node:path'
+import { join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { checkSpec } from './check.js'
 import {
@@ -216,7 +216,7 @@ function init(root: string, args: Args, log: (s?: string) => void): number {
     writeFileSync(configPath, JSON.stringify({ contextDir, specsDir: existing.specsDir }, null, 2) + '\n')
     log(`Wrote ${CONFIG_FILE} (context in ${contextDir})`)
   }
-  const ctxDir = join(root, contextDir)
+  const ctxDir = resolve(root, contextDir)
   mkdirSync(ctxDir, { recursive: true })
   for (const f of CONTEXT_FILES) {
     const p = join(ctxDir, f)
